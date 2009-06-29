@@ -75,45 +75,47 @@ Rake::RDocTask.new do |rd|
 #  rd.options << "--all"
 end
 
-desc "Publish documentation"
-task :pdoc => [:rdoc] do
-  Rake::SshFreshDirPublisher.
-       new("thomas@rubyzip.sourceforge.net", "/home/groups/r/ru/rubyzip/htdocs", "html").upload
-end
-
-desc "Publish package"
-task :ppackage => [:package] do
-  Net::FTP.open("upload.sourceforge.net", 
-                "ftp", 
-                ENV['USER']+"@"+ENV['HOSTNAME']) {
-    |ftpclient|
-    ftpclient.passive = true
-    ftpclient.chdir "incoming"
-    Dir['pkg/*.{tgz,zip,gem}'].each {
-      |e|
-      ftpclient.putbinaryfile(e, File.basename(e))
-    }
-  }
-end
-
-desc "Generate the ChangeLog file"
-task :ChangeLog do
-  puts "Updating ChangeLog"
-  system %{cvs2cl}
-end
-
-desc "Make a release"
-task :release => [:tag_release, :pdoc, :ppackage] do
-end
-
-desc "Make a release tag"
-task :tag_release do
-  tag = "release-#{PKG_VERSION.gsub('.','-')}"
-
-  puts "Checking for tag '#{tag}'"
-  if (Regexp.new("^\\s+#{tag}") =~ `cvs log README`)
-    abort "Tag '#{tag}' already exists"
+namespace :rubyzip do
+  desc "Publish documentation"
+  task :pdoc => [:rdoc] do
+    Rake::SshFreshDirPublisher.
+         new("thomas@rubyzip.sourceforge.net", "/home/groups/r/ru/rubyzip/htdocs", "html").upload
   end
-  puts "Tagging module with '#{tag}'"
-  system("cvs tag #{tag}")
+
+  desc "Publish package"
+  task :ppackage => [:package] do
+    Net::FTP.open("upload.sourceforge.net", 
+                  "ftp", 
+                  ENV['USER']+"@"+ENV['HOSTNAME']) {
+      |ftpclient|
+      ftpclient.passive = true
+      ftpclient.chdir "incoming"
+      Dir['pkg/*.{tgz,zip,gem}'].each {
+        |e|
+        ftpclient.putbinaryfile(e, File.basename(e))
+      }
+    }
+  end
+
+  desc "Generate the ChangeLog file"
+  task :ChangeLog do
+    puts "Updating ChangeLog"
+    system %{cvs2cl}
+  end
+
+  desc "Make a release"
+  task :release => [:tag_release, :pdoc, :ppackage] do
+  end
+
+  desc "Make a release tag"
+  task :tag_release do
+    tag = "release-#{PKG_VERSION.gsub('.','-')}"
+
+    puts "Checking for tag '#{tag}'"
+    if (Regexp.new("^\\s+#{tag}") =~ `cvs log README`)
+      abort "Tag '#{tag}' already exists"
+    end
+    puts "Tagging module with '#{tag}'"
+    system("cvs tag #{tag}")
+  end
 end
