@@ -8,6 +8,7 @@ require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'rake/contrib/sshpublisher'
 require 'net/ftp'
+require 'jeweler'
 
 PKG_NAME = 'rubyzip'
 PKG_VERSION = File.read('lib/zip/zip.rb').match(/\s+VERSION\s*=\s*'(.*)'/)[1]
@@ -50,8 +51,16 @@ spec = Gem::Specification.new do |s|
   s.homepage = "http://rubyzip.sourceforge.net/"
   s.platform = Gem::Platform::RUBY
   s.summary = "rubyzip is a ruby module for reading and writing zip files"
+  s.description = "rubyzip is a ruby module for reading and writing zip files"
   s.files = PKG_FILES.to_a
   s.require_path = 'lib'
+end
+
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new(spec)
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|

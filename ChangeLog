@@ -1,3 +1,7 @@
+2009-06-29 16:20 erawk
+
+	* Rakefile: Use jeweler to release gem to GitHub
+
 2006-07-01 10:04  thomas
 
 	* Rakefile: Don't autorequire zip/zip - autorequire is deprecated.
